@@ -24,9 +24,7 @@ export class XkcdDisplayComponent implements OnInit {
         );
         this.loading = false;
       },
-      (error) => {
-        console.log(error);
-      }
+      (error) => {}
     );
   }
 }

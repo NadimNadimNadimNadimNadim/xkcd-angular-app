@@ -41,7 +41,6 @@ function comicNumberValidator(
     return { notNumber: true };
   }
   if (parseInt(control.value) < 1) {
-    console.log(control.value);
     return { forbiddenRange: true };
   }
   // TODO: use service to check if comic with that number exists
