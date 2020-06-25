@@ -12,11 +12,11 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-app.get("/", function (req, res) {
-  res.sendFile(path.join(__dirname + "/dist/xkcd-app/index.html"));
-});
+// app.get("/", function (req, res) {
+//   res.sendFile(path.join(__dirname + "/dist/xkcd-app/index.html"));
+// });
 
-app.get("/current", async (req, res, next) => {
+app.get("/api/current", async (req, res, next) => {
   try {
     let response = await fetch(URL_START + URL_END);
     let json = await response.json();
@@ -25,7 +25,7 @@ app.get("/current", async (req, res, next) => {
     console.error(error);
   }
 });
-app.get("/:num", async (req, res, next) => {
+app.get("/api/:num", async (req, res, next) => {
   try {
     let response = await fetch(URL_START + req.params.num + URL_END);
     let json = await response.json();
