@@ -12,9 +12,9 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-// app.get("/", function (req, res) {
-//   res.sendFile(path.join(__dirname + "/dist/xkcd-app/index.html"));
-// });
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname + "/dist/xkcd-app/index.html"));
+});
 
 app.get("/api/current", async (req, res, next) => {
   try {
