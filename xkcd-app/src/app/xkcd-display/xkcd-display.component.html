@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="col-sm loading" *ngIf="loading">
+    <i class="fa fa-spinner fa-spin"></i>
+  </div>
+  <div class="col-sm" *ngIf="!loading">
+    <div class="text-center">
+      <h1 class="display-4">{{ searchResult?.safe_title }}</h1>
+      <img
+        class="images"
+        *ngIf="!loading"
+        src="{{ searchResult?.img }}"
+        alt="{{ searchResult?.alt }}"
+      />
+      <h2 class="display-4">{{ date | date: "longDate" }}</h2>
+    </div>
+  </div>
+</div>

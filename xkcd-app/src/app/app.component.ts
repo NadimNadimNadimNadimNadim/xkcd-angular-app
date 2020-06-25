@@ -1,28 +1,49 @@
-import { Component, OnInit } from '@angular/core';
-import { XkcdSearchService } from './xkcd-search.service';
-import { XkcdSearch } from './xkcd-search';
+import { Component } from '@angular/core';
 
+import { XkcdSearchService } from './xkcd-search.service';
+import {
+  NgForm,
+  FormGroup,
+  FormControl,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'xkcd browser';
-  loading: boolean;
-  searchResult: XkcdSearch;
+  comicNumber: string;
+  form = new FormGroup({
+    comicNumber: new FormControl('', [
+      Validators.required,
+      comicNumberValidator,
+    ]),
+  });
+
   constructor(private XkcdSearchService: XkcdSearchService) {}
-  ngOnInit() {
-    this.loading = true;
-    this.XkcdSearchService.xkcdCurrentComic().subscribe(
-      (result) => {
-        this.searchResult = result;
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-    this.loading = false;
-    // console.log(this.XkcdSearchService.xkcdCurrentComic());
+
+  sendSearch() {
+    if (!this.form.controls['comicNumber'].errors) {
+      this.XkcdSearchService.xkcdSearch(
+        parseInt(this.form.controls['comicNumber'].value).toString()
+      );
+    }
   }
+}
+
+function comicNumberValidator(
+  control: AbstractControl
+): { [key: string]: boolean } | null {
+  if (isNaN(control.value)) {
+    return { notNumber: true };
+  }
+  if (parseInt(control.value) < 1) {
+    console.log(control.value);
+    return { forbiddenRange: true };
+  }
+  // TODO: use service to check if comic with that number exists
+  return null;
 }

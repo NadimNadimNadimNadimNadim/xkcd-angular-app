@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { XkcdSearch } from './xkcd-search';
-import { Observable, of, EMPTY } from 'rxjs';
+import { Observable, of, EMPTY, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { shareReplay, catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
@@ -11,18 +11,33 @@ export class XkcdSearchService {
   private readonly URL_START = 'http://xkcd.com/';
   private readonly URL_END = '/info.0.json';
   private readonly CURRENT_COMIC_CODE = '-1';
-  cache = new Map<string, XkcdSearch>();
+  private searchResults = new ReplaySubject<XkcdSearch>();
+  private cache = new Map<string, XkcdSearch>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.xkcdCurrentComic().subscribe((res) => {
+      this.searchResults.next(res);
+    });
+  }
 
-  xkcdSearch(comicNumber: string): Observable<XkcdSearch> {
+  onResults(): Observable<XkcdSearch> {
+    return this.searchResults.asObservable();
+  }
+
+  xkcdSearch(comicNumber: string): void {
+    console.log('in xkcdSearch(), comic number = ' + comicNumber);
     if (this.cache[comicNumber]) {
-      return of(this.cache[comicNumber]);
+      console.log('in xkcdSearch() if, comic number = ' + comicNumber);
+      this.searchResults.next(this.cache[comicNumber]);
     }
 
     this.cache[comicNumber] = this.http
-      .get<XkcdSearch>(environment.xkcdServer + `${comicNumber}`)
+      .get<XkcdSearch>(environment.xkcdServer + `/${comicNumber}`)
       .pipe(
+        (res) => {
+          res.subscribe((res) => this.searchResults.next(res));
+          return res;
+        },
         shareReplay(1),
         catchError((err) => {
           console.error(err);
@@ -31,6 +46,7 @@ export class XkcdSearchService {
         })
       );
   }
+
   xkcdCurrentComic(): Observable<XkcdSearch> {
     if (this.cache[this.CURRENT_COMIC_CODE]) {
       return of(this.cache[this.CURRENT_COMIC_CODE]);
@@ -39,6 +55,10 @@ export class XkcdSearchService {
     return (this.cache[this.CURRENT_COMIC_CODE] = this.http
       .get<XkcdSearch>(environment.xkcdServer + '/current')
       .pipe(
+        (res) => {
+          res.subscribe((res) => this.searchResults.next(res));
+          return res;
+        },
         shareReplay(1),
         catchError((err) => {
           console.error(err);
