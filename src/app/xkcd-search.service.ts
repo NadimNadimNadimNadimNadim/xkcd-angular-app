@@ -8,8 +8,6 @@ import { environment } from '../environments/environment';
   providedIn: 'root',
 })
 export class XkcdSearchService {
-  private readonly URL_START = 'http://xkcd.com/';
-  private readonly URL_END = '/info.0.json';
   private readonly CURRENT_COMIC_CODE = '-1';
   private searchResults = new ReplaySubject<XkcdSearch>();
   private cache = new Map<string, XkcdSearch>();
@@ -25,9 +23,7 @@ export class XkcdSearchService {
   }
 
   xkcdSearch(comicNumber: string): void {
-    console.log('in xkcdSearch(), comic number = ' + comicNumber);
     if (this.cache[comicNumber]) {
-      console.log('in xkcdSearch() if, comic number = ' + comicNumber);
       this.searchResults.next(this.cache[comicNumber]);
     }
 
